@@ -10,6 +10,7 @@ int main()
     int specialtyCapacity[4] = {30, 20, 12, 10};
     int wardRate[4] = {3000, 6000, 12000, 25000};
     int wardCapacity[4] = {20, 10, 10, 5};
+    int bedOccupancy[4][20] = {0};
     printf("----------------------------------SMART HOSPITAL PATIENT & RESOURCE ALLOCATION SYSTEM----------------------------------\n");
     displayHospitalInformation();
 
