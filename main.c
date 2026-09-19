@@ -27,7 +27,7 @@ int main()
     int wardRate[4] = {3000, 6000, 12000, 25000};
     int wardCapacity[4] = {20, 10, 10, 5};
     int bedOccupancy[4][20] = {0};
-    int bedNumber = allocateBed(bedOccupancy, wardCapacity, 3);
+    loadBeds(bedOccupancy, wardCapacity);
     char patientName[MAX_PATIENTS][50];
     int patientAge[MAX_PATIENTS];
     int patientUrgency[MAX_PATIENTS];
@@ -44,35 +44,17 @@ int main()
     float patientFinalBill[MAX_PATIENTS];
     int patientCount = 0;
     int queueCount[4] = {0};
-    int index;
+    int index = -1;
     int patientOrder[MAX_PATIENTS];
     printf("----------------------------------SMART HOSPITAL PATIENT & RESOURCE ALLOCATION SYSTEM----------------------------------\n");
     displayHospitalInformation();
     displayBeds(bedOccupancy, wardCapacity);
-    if (bedNumber != -1)
-    {
-        printf("Allocated ICU Bed %d\n", bedNumber);
-    }
-    else
-    {
-        printf("No beds available in ICU\n");
-    }
 
-    registerPatient(patientName, patientAge, patientUrgency, patientSpecialty, patientAdmitted, patientWard, patientDays, &patientCount, bedOccupancy, patientBed, wardCapacity);
-    patientWaitingTime[index] = calculateWaitingTime(patientSpecialty[index], queueCount, specialtyTime);
-    queueCount[patientSpecialty[index]]++;
-    patientBaseFee[index] =
-    specialtyFee[patientSpecialty[index]];
+    registerPatient(patientName, patientAge, patientUrgency, patientSpecialty,
+                patientAdmitted, patientWard, patientDays, &patientCount,
+                bedOccupancy, patientBed, wardCapacity);
 
-    patientSurcharge[index] = calculateSurcharge(patientBaseFee[index],patientUrgency[index]);
-
-    patientWardCost[index] = calculateWardCost(patientWard[index], patientDays[index], wardRate);
-
-    float grossTotal = patientBaseFee[index] + patientSurcharge[index] + patientWardCost[index];
-
-    patientDiscount[index] = calculateDiscount(grossTotal, patientAge[index]);
-
-    patientFinalBill[index] = calculateFinalBill(grossTotal, patientDiscount[index]);
+    index = patientCount - 1;
 
     int choice;
 
@@ -84,12 +66,41 @@ int main()
         switch (choice)
         {
             case 1:
-            /* Registration */
-            break;
+                if (patientCount >= MAX_PATIENTS) {
+                    printf("Maximum patient capacity reached.\n");
+                    break;
+                }
+
+                registerPatient(patientName, patientAge, patientUrgency, patientSpecialty,
+                                patientAdmitted, patientWard, patientDays, &patientCount,
+                                bedOccupancy, patientBed, wardCapacity);
+
+                index = patientCount - 1;
+
+                patientWaitingTime[index] = calculateWaitingTime(patientSpecialty[index], queueCount, specialtyTime);
+                queueCount[patientSpecialty[index]]++;
+                patientBaseFee[index] = specialtyFee[patientSpecialty[index]];
+                patientSurcharge[index] = calculateSurcharge(patientBaseFee[index], patientUrgency[index]);
+                patientWardCost[index] = calculateWardCost(patientWard[index], patientDays[index], wardRate);
+
+                float grossTotal = patientBaseFee[index] + patientSurcharge[index] + patientWardCost[index];
+                patientDiscount[index] = calculateDiscount(grossTotal, patientAge[index]);
+                patientFinalBill[index] = calculateFinalBill(grossTotal, patientDiscount[index]);
+
+                displayPatientBill(index, patientName, patientAge, patientUrgency, patientSpecialty, patientWard, patientWaitingTime, patientBaseFee, patientSurcharge, patientWardCost, patientDiscount, patientFinalBill);
+
+                savePatientRecord(index, patientName, patientAge, patientUrgency, patientSpecialty);
+                break;
 
             case 2:
-            /* Display Patients */
-            break;
+                if (patientCount == 0) {
+                    printf("No patients registered yet.\n");
+                } else {
+                    for (int i = 0; i < patientCount; i++) {
+                        displayPatientBill(i, patientName, patientAge, patientUrgency, patientSpecialty, patientWard, patientWaitingTime, patientBaseFee, patientSurcharge, patientWardCost, patientDiscount, patientFinalBill);
+                    }
+                }
+                break;
 
             case 3:
             displayBeds(bedOccupancy, wardCapacity);
@@ -97,10 +108,23 @@ int main()
 
             case 4:
             /* Priority Sorting */
+            if (patientCount == 0) {
+                    printf("No patients to sort.\n");
+            } else {
+                for (int i = 0; i < patientCount; i++) {
+                    patientOrder[i] = i;
+                }
+                sortPatientsByPriority(patientOrder, patientCount, patientUrgency);
+                    printf("\n--- PATIENTS SORTED BY TRIAGE PRIORITY ---\n");
+                    for (int i = 0; i < patientCount; i++) {
+                        displayPatientBill(patientOrder[i], patientName, patientAge, patientUrgency, patientSpecialty, patientWard, patientWaitingTime, patientBaseFee, patientSurcharge, patientWardCost, patientDiscount, patientFinalBill);
+                    }
+                }
             break;
 
             case 5:
             /* reports */
+            displayReports(patientCount, patientUrgency, patientFinalBill, patientDiscount, bedOccupancy, wardCapacity);
             break;
 
             case 6:
@@ -114,8 +138,6 @@ int main()
     }while (choice != 6);
 
     patientOrder[patientCount - 1] = patientCount - 1;
-    sortPatientsByPriority(patientOrder,patientCount,patientUrgency);
-    savePatientRecord(patientCount - 1,patientName,patientAge,patientUrgency,patientSpecialty);
     saveBeds(bedOccupancy, wardCapacity);
 
     return 0;
@@ -251,6 +273,7 @@ void registerPatient( char patientName[][50], int patientAge[], int patientUrgen
         }
 
     } while (patientSpecialty[index] < 1 || patientSpecialty[index] > 4);
+    patientSpecialty[index]--;
 
     do
     {
@@ -425,6 +448,41 @@ void displayPatientBill(int index, char patientName[][50], int patientAge[], int
     printf("Waiting Time:   %d min\n",
            patientWaitingTime[index]);
 
+    if (patientDiscount[index] > 0) {
+        printf("Age                     : %d Years (15%% Subsidy Eligible)\n", patientAge[index]);
+    } else {
+        printf("Age                     : %d Years\n", patientAge[index]);
+    }
+
+    printf("Urgency Level           : Level %d (%s)\n", patientUrgency[index], urgencyNames[patientUrgency[index] - 1]);
+    printf("Base Consultation Fee   : LKR %.2f\n", patientBaseFee[index]);
+
+    if (patientUrgency[index] == 3) {
+        printf("Emergency Surcharge     : LKR %.2f (50%%)\n", patientSurcharge[index]);
+    } else if (patientUrgency[index] == 2) {
+        printf("Emergency Surcharge     : LKR %.2f (20%%)\n", patientSurcharge[index]);
+    } else {
+        printf("Emergency Surcharge     : LKR %.2f (0%%)\n", patientSurcharge[index]);
+    }
+
+    printf("Ward Stay Cost          : LKR %.2f\n", patientWardCost[index]);
+    printf("Gross Total Bill        : LKR %.2f\n", patientBaseFee[index] + patientSurcharge[index] + patientWardCost[index]);
+
+    if (patientDiscount[index] > 0) {
+        printf("Age Subsidy Discount    : LKR -%.2f (15%%)\n", patientDiscount[index]);
+    } else {
+        printf("Age Subsidy Discount    : LKR %.2f\n", patientDiscount[index]);
+    }
+
+    printf("Final Payable Amount    : LKR %.2f\n", patientFinalBill[index]);
+
+    // FIX: Added "Immediate Attention" tag for zero wait time
+    if (patientWaitingTime[index] == 0) {
+        printf("Estimated Waiting Time  : 0 mins (Immediate Attention)\n");
+    } else {
+        printf("Estimated Waiting Time  : %d mins\n", patientWaitingTime[index]);
+    }
+
     printf("=================================\n");
 }
 
@@ -564,6 +622,22 @@ void displayReports(int patientCount,int patientUrgency[],float patientFinalBill
     else
     {
         printf("\nNo patients registered.\n");
+    }
+    printf("\nWARD OCCUPANCY PERCENTAGE\n");
+    char *wardNamesRep[4] = {"General Ward", "Paediatric Ward", "Surgical Ward", "ICU"};
+
+    for (int i = 0; i < 4; i++)
+    {
+        int occupied = 0;
+        for (int j = 0; j < wardCapacity[i]; j++)
+        {
+            if (bedOccupancy[i][j] == 1)
+            {
+                occupied++;
+            }
+        }
+        float percent = ((float)occupied / wardCapacity[i]) * 100.0;
+        printf("%-17s: %.2f%%\n", wardNamesRep[i], percent);
     }
 
     printf("===================================\n");
