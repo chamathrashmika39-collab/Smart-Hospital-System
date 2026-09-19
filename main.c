@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#define MAX_PATIENTS 100
 
 void displayHospitalInformation();
 void displayBeds(int bedOccupancy[4][20], int wardCapacity[4]);
@@ -14,6 +15,21 @@ int main()
     int wardCapacity[4] = {20, 10, 10, 5};
     int bedOccupancy[4][20] = {0};
     int bedNumber = allocateBed(bedOccupancy, wardCapacity, 3);
+    char patientName[MAX_PATIENTS][50];
+    int patientAge[MAX_PATIENTS];
+    int patientUrgency[MAX_PATIENTS];
+    int patientSpecialty[MAX_PATIENTS];
+    int patientAdmitted[MAX_PATIENTS];
+    int patientWard[MAX_PATIENTS];
+    int patientDays[MAX_PATIENTS];
+    int patientBed[MAX_PATIENTS];
+    int patientWaitingTime[MAX_PATIENTS];
+    float patientBaseFee[MAX_PATIENTS];
+    float patientSurcharge[MAX_PATIENTS];
+    float patientWardCost[MAX_PATIENTS];
+    float patientDiscount[MAX_PATIENTS];
+    float patientFinalBill[MAX_PATIENTS];
+    int patientCount = 0;
     printf("----------------------------------SMART HOSPITAL PATIENT & RESOURCE ALLOCATION SYSTEM----------------------------------\n");
     displayHospitalInformation();
     displayBeds(bedOccupancy, wardCapacity);
