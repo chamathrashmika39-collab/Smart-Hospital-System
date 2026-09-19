@@ -11,6 +11,7 @@ float calculateSurcharge(float baseFee, int urgency);
 float calculateWardCost(int ward, int days, int wardRate[]);
 float calculateDiscount(float grossTotal, int age);
 float calculateFinalBill(float grossTotal, float discount);
+void displayPatientBill(int index, char patientName[][50], int patientAge[], int patientUrgency[], int patientSpecialty[], int patientWard[], int patientWaitingTime[], float patientBaseFee[], float patientSurcharge[], float patientWardCost[], float patientDiscount[], float patientFinalBill[]);
 
 int main()
 {
@@ -320,4 +321,62 @@ float calculateDiscount(float grossTotal, int age)
 float calculateFinalBill(float grossTotal, float discount)
 {
     return grossTotal - discount;
+}
+
+void displayPatientBill(int index, char patientName[][50], int patientAge[], int patientUrgency[], int patientSpecialty[], int patientWard[], int patientWaitingTime[], float patientBaseFee[], float patientSurcharge[], float patientWardCost[], float patientDiscount[], float patientFinalBill[])
+{
+    char *specialtyNames[4] = {"General Practice", "Paediatrics", "Cardiology", "Neurology"};
+
+    char *wardNames[4] = {"General Ward", "Paediatric Ward", "Surgical Ward", "ICU"};
+
+    char *urgencyNames[3] = {"Normal", "Urgent", "Critical"};
+
+    printf("\n==================================\n");
+    printf("          PATIENT BILL\n");
+    printf("==================================\n");
+
+    printf("Patient ID: PAT-%04d\n", 1001 + index);
+    printf("Name: %s\n", patientName[index]);
+    printf("Age: %d\n", patientAge[index]);
+
+    printf("Specialty: %s\n",
+           specialtyNames[patientSpecialty[index]]);
+
+    printf("Urgency: %s\n",
+           urgencyNames[patientUrgency[index] - 1]);
+
+    if (patientWard[index] != -1)
+    {
+        printf("Ward: %s\n",
+               wardNames[patientWard[index]]);
+    }
+    else
+    {
+        printf("Ward: Outpatient\n");
+    }
+
+    printf("\nBase Fee:       %.2f\n",
+           patientBaseFee[index]);
+
+    printf("Surcharge:      %.2f\n",
+           patientSurcharge[index]);
+
+    printf("Ward Cost:      %.2f\n",
+           patientWardCost[index]);
+
+    printf("Gross Total:    %.2f\n",
+           patientBaseFee[index] +
+           patientSurcharge[index] +
+           patientWardCost[index]);
+
+    printf("Discount:       %.2f\n",
+           patientDiscount[index]);
+
+    printf("Final Payable:  %.2f\n",
+           patientFinalBill[index]);
+
+    printf("Waiting Time:   %d min\n",
+           patientWaitingTime[index]);
+
+    printf("=================================\n");
 }
