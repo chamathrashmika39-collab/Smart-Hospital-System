@@ -6,6 +6,11 @@ void displayHospitalInformation();
 void displayBeds(int bedOccupancy[4][20], int wardCapacity[4]);
 int allocateBed(int bedOccupancy[4][20], int wardCapacity[4], int ward);
 void registerPatient(char patientName[][50], int patientAge[], int patientUrgency[], int patientSpecialty[], int patientAdmitted[], int patientWard[], int patientDays[], int *patientCount, int bedOccupancy[4][20], int patientBed[], int wardCapacity[4]);
+int calculateWaitingTime(int specialty, int queueCount[], int specialtyTime[]);
+float calculateSurcharge(float baseFee, int urgency);
+float calculateWardCost(int ward, int days, int wardRate[]);
+float calculateDiscount(float grossTotal, int age);
+float calculateFinalBill(float grossTotal, float discount);
 
 int main()
 {
@@ -31,6 +36,8 @@ int main()
     float patientDiscount[MAX_PATIENTS];
     float patientFinalBill[MAX_PATIENTS];
     int patientCount = 0;
+    int queueCount[4] = {0};
+    int index;
     printf("----------------------------------SMART HOSPITAL PATIENT & RESOURCE ALLOCATION SYSTEM----------------------------------\n");
     displayHospitalInformation();
     displayBeds(bedOccupancy, wardCapacity);
@@ -42,7 +49,22 @@ int main()
     {
         printf("No beds available in ICU\n");
     }
+
     registerPatient(patientName, patientAge, patientUrgency, patientSpecialty, patientAdmitted, patientWard, patientDays, &patientCount, bedOccupancy, patientBed, wardCapacity);
+    patientWaitingTime[index] = calculateWaitingTime(patientSpecialty[index], queueCount, specialtyTime);
+    queueCount[patientSpecialty[index]]++;
+    patientBaseFee[index] =
+    specialtyFee[patientSpecialty[index]];
+
+    patientSurcharge[index] = calculateSurcharge(patientBaseFee[index],patientUrgency[index]);
+
+    patientWardCost[index] = calculateWardCost(patientWard[index], patientDays[index], wardRate);
+
+    float grossTotal = patientBaseFee[index] + patientSurcharge[index] + patientWardCost[index];
+
+    patientDiscount[index] = calculateDiscount(grossTotal, patientAge[index]);
+
+    patientFinalBill[index] = calculateFinalBill(grossTotal, patientDiscount[index]);
     return 0;
 }
 
@@ -256,4 +278,46 @@ void registerPatient( char patientName[][50], int patientAge[], int patientUrgen
     (*patientCount)++;
 
     printf("\nPatient registered successfully.\n");
+}
+
+int calculateWaitingTime(int specialty, int queueCount[], int specialtyTime[])
+{
+    return queueCount[specialty] * specialtyTime[specialty];
+}
+
+float calculateSurcharge(float baseFee, int urgency)
+{
+    if (urgency == 3)
+    {
+        return baseFee * 0.50;
+    }
+    else if (urgency == 2)
+    {
+        return baseFee * 0.20;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+float calculateWardCost(int ward, int days, int wardRate[])
+{
+    if (ward == -1) return 0;
+    return wardRate[ward] * days;
+}
+
+float calculateDiscount(float grossTotal, int age)
+{
+    if (age < 5 || age > 65)
+    {
+        return grossTotal * 0.15;
+    }
+
+    return 0;
+}
+
+float calculateFinalBill(float grossTotal, float discount)
+{
+    return grossTotal - discount;
 }
