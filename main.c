@@ -5,6 +5,7 @@
 void displayHospitalInformation();
 void displayBeds(int bedOccupancy[4][20], int wardCapacity[4]);
 int allocateBed(int bedOccupancy[4][20], int wardCapacity[4], int ward);
+void registerPatient(char patientName[][50], int patientAge[], int patientUrgency[], int patientSpecialty[], int patientAdmitted[], int patientWard[], int patientDays[], int *patientCount, int bedOccupancy[4][20], int patientBed[], int wardCapacity[4]);
 
 int main()
 {
@@ -41,6 +42,7 @@ int main()
     {
         printf("No beds available in ICU\n");
     }
+    registerPatient(patientName, patientAge, patientUrgency, patientSpecialty, patientAdmitted, patientWard, patientDays, &patientCount, bedOccupancy, patientBed, wardCapacity);
     return 0;
 }
 
@@ -79,6 +81,7 @@ void displayHospitalInformation()
             printf("ICU\n");
     }
 }
+
 
 void displayBeds(int bedOccupancy[4][20], int wardCapacity[4])
 {
@@ -121,4 +124,136 @@ int allocateBed(int bedOccupancy[4][20], int wardCapacity[4], int ward)
     }
 
     return -1;
+}
+
+void registerPatient( char patientName[][50], int patientAge[], int patientUrgency[], int patientSpecialty[], int patientAdmitted[], int patientWard[], int patientDays[], int *patientCount, int bedOccupancy[4][20], int patientBed[], int wardCapacity[4])
+{
+    int index = *patientCount;
+
+    printf("\n========================================\n");
+    printf("       PATIENT REGISTRATION\n");
+    printf("========================================\n");
+
+    printf("Enter patient name: ");
+    scanf(" %49[^\n]", patientName[index]);
+
+    do
+    {
+        printf("Enter age: ");
+        scanf("%d", &patientAge[index]);
+
+        if (patientAge[index] < 0)
+        {
+            printf("Invalid age. Please try again.\n");
+        }
+
+    } while (patientAge[index] < 0);
+
+    do
+    {
+        printf("\nUrgency\n");
+        printf("1. Normal\n");
+        printf("2. Urgent\n");
+        printf("3. Critical\n");
+        printf("Enter urgency: ");
+        scanf("%d", &patientUrgency[index]);
+
+        if (patientUrgency[index] < 1 || patientUrgency[index] > 3)
+        {
+            printf("Invalid urgency.\n");
+        }
+
+    } while (patientUrgency[index] < 1 || patientUrgency[index] > 3);
+
+    do
+    {
+        printf("\nSpecialties\n");
+        printf("1. General Practice\n");
+        printf("2. Paediatrics\n");
+        printf("3. Cardiology\n");
+        printf("4. Neurology\n");
+        printf("Enter specialty: ");
+        scanf("%d", &patientSpecialty[index]);
+
+        if (patientSpecialty[index] < 1 || patientSpecialty[index] > 4)
+        {
+            printf("Invalid specialty.\n");
+        }
+
+    } while (patientSpecialty[index] < 1 || patientSpecialty[index] > 4);
+
+    do
+    {
+        printf("\nAdmitted?\n");
+        printf("0. No\n");
+        printf("1. Yes\n");
+        printf("Enter choice: ");
+        scanf("%d", &patientAdmitted[index]);
+
+        if (patientAdmitted[index] != 0 && patientAdmitted[index] != 1)
+        {
+            printf("Enter 0 or 1.\n");
+        }
+
+    } while (patientAdmitted[index] != 0 &&
+             patientAdmitted[index] != 1);
+
+    patientWard[index] = -1;
+    patientDays[index] = 0;
+    patientBed[index] = -1;
+
+    if (patientAdmitted[index] == 1)
+    {
+        do
+        {
+            printf("\nWards\n");
+            printf("1. General Ward\n");
+            printf("2. Paediatric Ward\n");
+            printf("3. Surgical Ward\n");
+            printf("4. ICU\n");
+            printf("Enter ward: ");
+            scanf("%d", &patientWard[index]);
+
+            if (patientWard[index] < 1 ||
+                patientWard[index] > 4)
+            {
+                printf("Invalid ward.\n");
+            }
+
+        } while (patientWard[index] < 1 ||
+                 patientWard[index] > 4);
+
+        patientWard[index]--;
+
+        do
+        {
+            printf("Enter number of days: ");
+            scanf("%d", &patientDays[index]);
+
+            if (patientDays[index] <= 0)
+            {
+                printf("Days must be greater than 0.\n");
+            }
+
+        } while (patientDays[index] <= 0);
+
+        patientBed[index] = allocateBed(bedOccupancy, wardCapacity, patientWard[index]);
+
+        if (patientBed[index] == -1)
+        {
+            printf("No beds available in selected ward.\n");
+            patientAdmitted[index] = 0;
+            patientWard[index] = -1;
+            patientDays[index] = 0;
+        }
+        else
+        {
+            printf("Patient allocated Bed %d.\n",
+                   patientBed[index]);
+        }
+    }
+
+    (*patientCount)++;
+
+    printf("\nPatient registered successfully.\n");
 }
