@@ -15,6 +15,9 @@ void displayPatientBill(int index, char patientName[][50], int patientAge[], int
 void displayMenu();
 void sortPatientsByPriority(int patientOrder[], int patientCount,int patientUrgency[]);
 void displayReports(int patientCount,int patientUrgency[],float patientFinalBill[],float patientDiscount[],int bedOccupancy[4][20], int wardCapacity[4]);
+void saveBeds(int bedOccupancy[4][20], int wardCapacity[4]);
+void loadBeds(int bedOccupancy[4][20], int wardCapacity[4]);
+void savePatientRecord(int index,char patientName[][50],int patientAge[],int patientUrgency[],int patientSpecialty[]);
 
 int main()
 {
@@ -112,6 +115,8 @@ int main()
 
     patientOrder[patientCount - 1] = patientCount - 1;
     sortPatientsByPriority(patientOrder,patientCount,patientUrgency);
+    savePatientRecord(patientCount - 1,patientName,patientAge,patientUrgency,patientSpecialty);
+    saveBeds(bedOccupancy, wardCapacity);
 
     return 0;
 }
@@ -563,3 +568,70 @@ void displayReports(int patientCount,int patientUrgency[],float patientFinalBill
 
     printf("===================================\n");
 }
+
+void saveBeds(int bedOccupancy[4][20],int wardCapacity[4])
+{
+    FILE *file = fopen("beds_status.txt", "w");
+
+    if (file == NULL)
+    {
+        printf("Unable to open beds_status.txt\n");
+        return;
+    }
+
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < wardCapacity[i]; j++)
+        {
+            fprintf(file, "%d ", bedOccupancy[i][j]);
+        }
+
+        fprintf(file, "\n");
+    }
+
+    fclose(file);
+}
+
+void loadBeds(int bedOccupancy[4][20], int wardCapacity[4])
+{
+    FILE *file = fopen("beds_status.txt", "r");
+
+    if (file == NULL)
+    {
+        return;
+    }
+
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < wardCapacity[i]; j++)
+        {
+            fscanf(file, "%d", &bedOccupancy[i][j]);
+        }
+    }
+
+    fclose(file);
+}
+
+void savePatientRecord(int index,char patientName[][50],int patientAge[],int patientUrgency[],int patientSpecialty[])
+{
+    FILE *file = fopen("patient_records.txt", "a");
+
+    if (file == NULL)
+    {
+        printf("Unable to open patient_records.txt\n");
+        return;
+    }
+
+    fprintf(
+        file,
+        "PAT-%04d | %s | Age: %d | Urgency: %d | Specialty: %d\n",
+        1001 + index,
+        patientName[index],
+        patientAge[index],
+        patientUrgency[index],
+        patientSpecialty[index]
+    );
+
+    fclose(file);
+}
+
