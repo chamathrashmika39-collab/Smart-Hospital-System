@@ -13,6 +13,7 @@ float calculateDiscount(float grossTotal, int age);
 float calculateFinalBill(float grossTotal, float discount);
 void displayPatientBill(int index, char patientName[][50], int patientAge[], int patientUrgency[], int patientSpecialty[], int patientWard[], int patientWaitingTime[], float patientBaseFee[], float patientSurcharge[], float patientWardCost[], float patientDiscount[], float patientFinalBill[]);
 void displayMenu();
+void sortPatientsByPriority(int patientOrder[], int patientCount,int patientUrgency[]);
 
 int main()
 {
@@ -40,6 +41,7 @@ int main()
     int patientCount = 0;
     int queueCount[4] = {0};
     int index;
+    int patientOrder[MAX_PATIENTS];
     printf("----------------------------------SMART HOSPITAL PATIENT & RESOURCE ALLOCATION SYSTEM----------------------------------\n");
     displayHospitalInformation();
     displayBeds(bedOccupancy, wardCapacity);
@@ -106,6 +108,9 @@ int main()
         }
 
     }while (choice != 6);
+
+    patientOrder[patientCount - 1] = patientCount - 1;
+    sortPatientsByPriority(patientOrder,patientCount,patientUrgency);
 
     return 0;
 }
@@ -431,3 +436,24 @@ void displayMenu()
     printf("===================================\n");
     printf("Enter your choice: ");
 }
+
+void sortPatientsByPriority(int patientOrder[], int patientCount,int patientUrgency[])
+{
+    for (int i = 0; i < patientCount - 1; i++)
+    {
+        for (int j = 0; j < patientCount - i - 1; j++)
+        {
+            if (patientUrgency[patientOrder[j]]
+                < patientUrgency[patientOrder[j + 1]])
+            {
+                int temp = patientOrder[j];
+
+                patientOrder[j] =
+                    patientOrder[j + 1];
+
+                patientOrder[j + 1] = temp;
+            }
+        }
+    }
+}
+
