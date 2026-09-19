@@ -12,6 +12,7 @@ float calculateWardCost(int ward, int days, int wardRate[]);
 float calculateDiscount(float grossTotal, int age);
 float calculateFinalBill(float grossTotal, float discount);
 void displayPatientBill(int index, char patientName[][50], int patientAge[], int patientUrgency[], int patientSpecialty[], int patientWard[], int patientWaitingTime[], float patientBaseFee[], float patientSurcharge[], float patientWardCost[], float patientDiscount[], float patientFinalBill[]);
+void displayMenu();
 
 int main()
 {
@@ -66,6 +67,46 @@ int main()
     patientDiscount[index] = calculateDiscount(grossTotal, patientAge[index]);
 
     patientFinalBill[index] = calculateFinalBill(grossTotal, patientDiscount[index]);
+
+    int choice;
+
+    do
+    {
+    displayMenu();
+    scanf("%d", &choice);
+
+        switch (choice)
+        {
+            case 1:
+            /* Registration */
+            break;
+
+            case 2:
+            /* Display Patients */
+            break;
+
+            case 3:
+            displayBeds(bedOccupancy, wardCapacity);
+            break;
+
+            case 4:
+            /* Priority Sorting */
+            break;
+
+            case 5:
+            /* reports */
+            break;
+
+            case 6:
+            printf("Exiting system...\n");
+            break;
+
+            default:
+            printf("Invalid choice.\n");
+        }
+
+    }while (choice != 6);
+
     return 0;
 }
 
@@ -108,12 +149,7 @@ void displayHospitalInformation()
 
 void displayBeds(int bedOccupancy[4][20], int wardCapacity[4])
 {
-    char *wardNames[4] = {
-        "GENERAL WARD",
-        "PAEDIATRIC WARD",
-        "SURGICAL WARD",
-        "ICU"
-    };
+    char *wardNames[4] = {"GENERAL WARD", "PAEDIATRIC WARD", "SURGICAL WARD", "ICU"};
 
     for (int i = 0; i < 4; i++)
     {
@@ -379,4 +415,19 @@ void displayPatientBill(int index, char patientName[][50], int patientAge[], int
            patientWaitingTime[index]);
 
     printf("=================================\n");
+}
+
+void displayMenu()
+{
+    printf("\n===================================\n");
+    printf("       SMART HOSPITAL SYSTEM\n");
+    printf("===================================\n");
+    printf("1. Register Patient\n");
+    printf("2. Display Patients\n");
+    printf("3. Display Bed Status\n");
+    printf("4. Display Patients by Priority\n");
+    printf("5. Hospital Reports\n");
+    printf("6. Exit\n");
+    printf("===================================\n");
+    printf("Enter your choice: ");
 }
