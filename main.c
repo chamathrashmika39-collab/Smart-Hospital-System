@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 void displayHospitalInformation();
+void displayBeds(int bedOccupancy[4][20]);
 
 int main()
 {
@@ -13,7 +14,7 @@ int main()
     int bedOccupancy[4][20] = {0};
     printf("----------------------------------SMART HOSPITAL PATIENT & RESOURCE ALLOCATION SYSTEM----------------------------------\n");
     displayHospitalInformation();
-
+    displayBeds(bedOccupancy);
     return 0;
 }
 
@@ -53,4 +54,33 @@ void displayHospitalInformation()
     }
 }
 
+void displayBeds(int bedOccupancy[4][20])
+{
+    char *wardNames[4] = {
+        "GENERAL WARD",
+        "PAEDIATRIC WARD",
+        "SURGICAL WARD",
+        "ICU"
+    };
 
+    int wardCapacity[4] = {20, 10, 10, 5};
+
+    for (int i = 0; i < 4; i++)
+    {
+        printf("\n%s\n", wardNames[i]);
+
+        for (int j = 0; j < wardCapacity[i]; j++)
+        {
+            printf("Bed %d: ", j + 1);
+
+            if (bedOccupancy[i][j] == 0)
+            {
+                printf("Available\n");
+            }
+            else
+            {
+                printf("Occupied\n");
+            }
+        }
+    }
+}
